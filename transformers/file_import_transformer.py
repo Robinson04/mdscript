@@ -1,5 +1,5 @@
-from base_transformer import BaseTransformer
-from runner import Runner
+from mdscript import Runner
+from mdscript.base_transformer import BaseTransformer
 from typing import Optional
 import os
 

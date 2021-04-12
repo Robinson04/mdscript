@@ -3,8 +3,8 @@ import re
 from pathlib import Path
 from typing import Any
 
-from files_dependencies_manager import FilesDependenciesManager
-from watcher import Watcher
+from mdscript.files_dependencies_manager import FilesDependenciesManager
+from mdscript.watcher import Watcher
 
 
 class Runner:

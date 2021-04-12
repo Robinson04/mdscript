@@ -1,7 +1,7 @@
-from config import MDScriptConfig
-from runner import Runner
-from transformers.file_import_transformer import FileImportTransformer
-from transformers.structnosql_sample_transformer import StructNoSQLSampleTransformer
+from mdscript.config import MDScriptConfig
+from mdscript.runner import Runner
+from mdscript.transformers import FileImportTransformer
+from mdscript.transformers import StructNoSQLSampleTransformer
 
 Runner(MDScriptConfig(
     transformers={

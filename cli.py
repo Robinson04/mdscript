@@ -1,5 +1,5 @@
 import click
-from runner import Runner
+from mdscript.runner import Runner
 # todo: deprecated
 
 @click.command()

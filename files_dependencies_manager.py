@@ -1,6 +1,5 @@
+from mdscript.watcher import Watcher
 from typing import Set, Dict
-
-from watcher import Watcher
 
 
 class FilesDependenciesManager:

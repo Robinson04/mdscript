@@ -1,25 +1,24 @@
+from mdscript import BaseTransformer, Runner
 from typing import Optional
-
-from base_transformer import BaseTransformer
-from runner import Runner
-
 import json
 import logging
 import os
-from StructNoSQL import TableDataModel, BasicTable, PrimaryIndex
 
 
-class UsersTableModel(TableDataModel):
-    pass
+def make_user_table():
+    from StructNoSQL import TableDataModel, BasicTable, PrimaryIndex
+    class UsersTableModel(TableDataModel):
+        pass
 
-class UsersTable(BasicTable):
-    def __init__(self):
-        primary_index = PrimaryIndex(hash_key_name='userId', hash_key_variable_python_type=str)
-        super().__init__(
-            table_name='accounts-data', region_name='eu-west-2',
-            data_model=UsersTableModel(), primary_index=primary_index,
-            auto_create_table=True
-        )
+    class UsersTable(BasicTable):
+        def __init__(self):
+            primary_index = PrimaryIndex(hash_key_name='userId', hash_key_variable_python_type=str)
+            super().__init__(
+                table_name='accounts-data', region_name='eu-west-2',
+                data_model=UsersTableModel(), primary_index=primary_index,
+                auto_create_table=True
+            )
+    return UsersTable()
 
 
 class StructNoSQLSampleTransformer(BaseTransformer):
@@ -69,7 +68,7 @@ class StructNoSQLSampleTransformer(BaseTransformer):
         return self.get_register_file_as_dependency('output.txt')
 
     def test(self) -> bool:
-        table_client = UsersTable()
+        table_client = make_user_table()
         record_data = json.loads(self.get_record())
         put_record_success = table_client.dynamodb_client.put_record(item_dict=record_data)
 

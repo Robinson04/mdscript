@@ -1,4 +1,4 @@
-from runner import Runner
+from mdscript.runner import Runner
 from abc import abstractmethod
 from typing import Optional
 

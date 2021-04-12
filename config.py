@@ -1,5 +1,5 @@
+from mdscript.base_transformer import BaseTransformer
 from typing import Dict
-from base_transformer import BaseTransformer
 
 
 class MDScriptConfig:
