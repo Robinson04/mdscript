@@ -27,6 +27,7 @@ class StructNoSQLSampleTransformer(BaseTransformer):
         if self.attribute is None:
             raise Exception(f"Attribute must be specified with the StructNoSQLSampleTransformer")
         self.dirpath = f'F:/Inoft/StructNoSQL/docs/samples/{self.attribute}'
+        # todo: remove static use of an hardcoded dirpath
 
     def transform(self) -> str:
         return f"""

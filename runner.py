@@ -66,5 +66,5 @@ class Runner:
 
     def run_watch(self, dirpath: str, run_tests: bool):
         self.run_in_folders(dirpath=dirpath, run_tests=run_tests)
-        self.watcher.start()
+        self.watcher.start(dirpath=dirpath)
 
