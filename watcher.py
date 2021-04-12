@@ -36,7 +36,7 @@ class BaseWatcherEventHandler(FileSystemEventHandler):
     def raran(self, unprocessed_filepath: str):
         filepath = Path(unprocessed_filepath)
         if filepath.suffix == '.md' and filepath.parts[-1][0:2] == '__':
-            self.runner.run_with_filepath(source_filepath=unprocessed_filepath)
+            self.runner.run_with_filepath(source_filepath=unprocessed_filepath, run_test=False)
 
     def process_src_path(self, src_path: str) -> str:
         if src_path[-1] == '~':
@@ -48,6 +48,8 @@ class BaseWatcherEventHandler(FileSystemEventHandler):
         if dependencies_filepaths is not None:
             for dependency_filepath in dependencies_filepaths:
                 self.raran(dependency_filepath)
+
+        self.raran(source_filepath)
 
         what = 'directory' if event.is_directory else 'file'
         self.logger.info("Modified %s: %s", what, event.src_path)
