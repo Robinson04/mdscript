@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="mdscript",
-    version="0.1.2",
+    version="0.1.3",
     packages=['mdscript', 'mdscript.transformers'],
     include_package_data=True,
     install_requires=["click", "watchdog"],

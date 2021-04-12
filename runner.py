@@ -8,12 +8,13 @@ from mdscript.watcher import Watcher
 
 
 class Runner:
-    def __init__(self, config: Any):
+    def __init__(self, config: Any, base_dirpath: str):
         self.config = config
+        self.base_dirpath = base_dirpath
         self.watcher = Watcher(runner=self)
         self.files_dependencies = FilesDependenciesManager(watcher=self.watcher)
 
-    def run_in_file(self, source_filepath: str, output_filepath: str, run_test: bool):
+    def _run_in_file(self, source_filepath: str, output_filepath: str, run_test: bool):
         with open(source_filepath, 'r') as source_markdown_file:
             source_file_content = source_markdown_file.read()
 
@@ -22,6 +23,7 @@ class Runner:
 
             transformers_names_selectors = '|'.join(self.config.transformers.keys())
             transformers_regex = '({{)' + f'({transformers_names_selectors})' + '(::)(.*)(}})'
+            # Instead of looking for each transformer one by one, we create a simple regex tasked with finding any transformer
 
             for match in re.finditer(pattern=transformers_regex, string=source_file_content):
                 match_start = match.start()
@@ -50,21 +52,31 @@ class Runner:
             with open(output_filepath, 'w+') as output_file:
                 output_file.write(rendered_file_content)
 
-    def run_with_filepath(self, source_filepath: str, run_test: bool):
+    def _run_with_filepath(self, source_filepath: str, run_test: bool):
         source_filepath_parts = Path(source_filepath).parts
         output_filepath = os.path.join(*source_filepath_parts[0:len(source_filepath_parts)-1], source_filepath_parts[-1][2:])
-        self.run_in_file(source_filepath=source_filepath, output_filepath=output_filepath, run_test=run_test)
+        self._run_in_file(source_filepath=source_filepath, output_filepath=output_filepath, run_test=run_test)
 
-    def run_in_folders(self, dirpath: str, run_tests: bool):
+    def _run_in_folder(self, dirpath: str, run_tests: bool):
         for root_dirpath, dirs, filenames in os.walk(dirpath):
             for filename in filenames:
                 if filename[0:2] == '__':
                     source_filepath = os.path.join(root_dirpath, filename)
                     output_filename = filename[2:]
                     output_filepath = os.path.join(root_dirpath, output_filename)
-                    self.run_in_file(source_filepath=source_filepath, output_filepath=output_filepath, run_test=run_tests)
+                    self._run_in_file(source_filepath=source_filepath, output_filepath=output_filepath, run_test=run_tests)
 
-    def run_watch(self, dirpath: str, run_tests: bool):
-        self.run_in_folders(dirpath=dirpath, run_tests=run_tests)
-        self.watcher.start(dirpath=dirpath)
+    def _start(self, run_tests: bool):
+        self._run_in_folder(dirpath=self.base_dirpath, run_tests=run_tests)
+        # When starting the runner, we first run the base_dirpath folder once, which
+        # will build all of our mdscript files, and index all the dependency files.
+        self.watcher.start()
+        # Then, we simply start the watcher, which will always watch the entire base_dirpath
+        # folder, and all of the dependencies files will have already been added to its watch.
+
+    def start(self):
+        self._start(run_tests=False)
+
+    def start_with_tests(self):
+        self._start(run_tests=True)
 

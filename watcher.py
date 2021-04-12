@@ -38,7 +38,7 @@ class BaseWatcherEventHandler(FileSystemEventHandler):
     def run_if_file_name_valid(self, unprocessed_filepath: str):
         filepath = Path(unprocessed_filepath)
         if filepath.suffix == '.md' and filepath.parts[-1][0:2] == '__':
-            self.runner.run_with_filepath(source_filepath=unprocessed_filepath, run_test=False)
+            self.runner._run_with_filepath(source_filepath=unprocessed_filepath, run_test=False)
 
     def confirm_modified(self, event, source_filepath: str):
         dependencies_filepaths = self.runner.files_dependencies.dependencies_to_parents.get(source_filepath, None)
@@ -77,9 +77,9 @@ class Watcher:
         self.observer = Observer()
         self.directory_files_watchers: Dict[str, DirectoryFilesWatcherEventHandler] = dict()
 
-    def start(self, dirpath: str):
+    def start(self):
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-        self.observer.schedule(event_handler=FolderWatcherEventHandler(runner=self.runner), path=dirpath, recursive=True)
+        self.observer.schedule(event_handler=FolderWatcherEventHandler(runner=self.runner), path=self.runner.base_dirpath, recursive=True)
         self.observer.start()
         try:
             while True:
