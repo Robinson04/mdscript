@@ -77,6 +77,7 @@ class StructNoSQLSampleTransformer(BaseTransformer):
 
         import sys
         from io import StringIO
+        stored_stdout = sys.stdout
         sys.stdout = buffer = StringIO()
 
         import importlib.util
@@ -87,9 +88,13 @@ class StructNoSQLSampleTransformer(BaseTransformer):
 
         result = buffer.getvalue()
         result = result.strip('\nNone\n')
+        buffer.close()
+
+        sys.stdout = stored_stdout
 
         expected_output = self.get_output()
         if result != expected_output:
-            logging.root.error(f"Expected output did not match : {result} vs {expected_output}")
+            print(f"Expected output did not match : {result} vs {expected_output}")
             return False
+        print(f"Test passed at {expected_code_filepath}")
         return True
