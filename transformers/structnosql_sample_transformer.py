@@ -33,7 +33,7 @@ class StructNoSQLSampleTransformer(BaseTransformer):
 
     def transform(self) -> str:
         return f"""
-### Queried record :
+### Queried record
 ```json
 {self.get_record()}
 ```

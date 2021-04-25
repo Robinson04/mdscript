@@ -53,8 +53,9 @@ class Runner:
                 output_file.write(rendered_file_content)
 
     def _run_with_filepath(self, source_filepath: str, run_test: bool):
-        source_filepath_parts = Path(source_filepath).parts
-        output_filepath = os.path.join(*source_filepath_parts[0:len(source_filepath_parts)-1], source_filepath_parts[-1][2:])
+        source_filepath_object = Path(source_filepath)
+        formatted_output_filename = source_filepath_object.name[2:]
+        output_filepath = os.path.join(source_filepath_object.parent, formatted_output_filename)
         self._run_in_file(source_filepath=source_filepath, output_filepath=output_filepath, run_test=run_test)
 
     def _run_in_folder(self, dirpath: str, run_tests: bool):
