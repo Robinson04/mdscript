@@ -27,7 +27,7 @@ class StructNoSQLSampleTransformer(BaseTransformer):
         if self.attribute is None:
             raise Exception(f"Attribute must be specified with the StructNoSQLSampleTransformer")
 
-        self.dirpath = os.path.join(self.runner.base_dirpath, 'samples', self.attribute)
+        self.dirpath = os.path.join(self.runner.base_dirpath, self.attribute)
         if not os.path.isdir(self.dirpath):
             raise Exception(f"No directory found at {self.dirpath}")
 

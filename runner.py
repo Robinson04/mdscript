@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 from pathlib import Path
@@ -15,42 +16,45 @@ class Runner:
         self.files_dependencies = FilesDependenciesManager(watcher=self.watcher)
 
     def _run_in_file(self, source_filepath: str, output_filepath: str, run_test: bool):
-        with open(source_filepath, 'r') as source_markdown_file:
-            source_file_content = source_markdown_file.read()
+        try:
+            with open(source_filepath, 'r') as source_markdown_file:
+                source_file_content = source_markdown_file.read()
 
-            rendered_file_content = ""
-            remaining_unprocessed_file_content = source_file_content
+                rendered_file_content = ""
+                remaining_unprocessed_file_content = source_file_content
 
-            transformers_names_selectors = '|'.join(self.config.transformers.keys())
-            transformers_regex = '({{)' + f'({transformers_names_selectors})' + '(::)(.*)(}})'
-            # Instead of looking for each transformer one by one, we create a simple regex tasked with finding any transformer
+                transformers_names_selectors = '|'.join(self.config.transformers.keys())
+                transformers_regex = '({{)' + f'({transformers_names_selectors})' + '(::)(.*)(}})'
+                # Instead of looking for each transformer one by one, we create a simple regex tasked with finding any transformer
 
-            for match in re.finditer(pattern=transformers_regex, string=source_file_content):
-                match_start = match.start()
-                match_end = match.end()
+                for match in re.finditer(pattern=transformers_regex, string=source_file_content):
+                    match_start = match.start()
+                    match_end = match.end()
 
-                index_relative_to_remaining_unprocessed = len(source_file_content) - len(remaining_unprocessed_file_content)
-                unprocessed_text_pre_match = remaining_unprocessed_file_content[0:match_start - index_relative_to_remaining_unprocessed]
-                remaining_unprocessed_file_content = remaining_unprocessed_file_content[match_end - index_relative_to_remaining_unprocessed:]
+                    index_relative_to_remaining_unprocessed = len(source_file_content) - len(remaining_unprocessed_file_content)
+                    unprocessed_text_pre_match = remaining_unprocessed_file_content[0:match_start - index_relative_to_remaining_unprocessed]
+                    remaining_unprocessed_file_content = remaining_unprocessed_file_content[match_end - index_relative_to_remaining_unprocessed:]
 
-                transformer_name = match[2]
-                transformer_attribute = match[4]
-                transformer_class_type = self.config.transformers.get(transformer_name, None)
-                if transformer_class_type is None:
-                    raise Exception(f"No transformer found for {transformer_name}")
+                    transformer_name = match[2]
+                    transformer_attribute = match[4]
+                    transformer_class_type = self.config.transformers.get(transformer_name, None)
+                    if transformer_class_type is None:
+                        raise Exception(f"No transformer found for {transformer_name}")
 
-                transformer_instance = transformer_class_type(
-                    runner=self, source_filepath=source_filepath, attribute=transformer_attribute
-                )
-                if run_test is True:
-                    transformer_instance.test()
+                    transformer_instance = transformer_class_type(
+                        runner=self, source_filepath=source_filepath, attribute=transformer_attribute
+                    )
+                    if run_test is True:
+                        transformer_instance.test()
 
-                transformed_content = transformer_instance.transform()
-                rendered_file_content += f"{unprocessed_text_pre_match}{transformed_content}"
-            rendered_file_content += remaining_unprocessed_file_content
+                    transformed_content = transformer_instance.transform()
+                    rendered_file_content += f"{unprocessed_text_pre_match}{transformed_content}"
+                rendered_file_content += remaining_unprocessed_file_content
 
-            with open(output_filepath, 'w+') as output_file:
-                output_file.write(rendered_file_content)
+                with open(output_filepath, 'w+') as output_file:
+                    output_file.write(rendered_file_content)
+        except Exception as e:
+            logging.warning(e)
 
     def _run_with_filepath(self, source_filepath: str, run_test: bool):
         source_filepath_object = Path(source_filepath)
