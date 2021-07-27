@@ -24,7 +24,7 @@ class Runner:
                 remaining_unprocessed_file_content = source_file_content
 
                 transformers_names_selectors: str = '|'.join(self.config.transformers.keys())
-                transformers_regex = '({{)' + f'({transformers_names_selectors})' + '(::)((.|\n)*)(}})'
+                transformers_regex = '({{)' + f'({transformers_names_selectors})' + '(::)((.|\n)*)(::}})'
                 # Instead of looking for each transformer one by one, we create a simple regex tasked with finding any transformer
 
                 for match in re.finditer(pattern=transformers_regex, string=source_file_content):
